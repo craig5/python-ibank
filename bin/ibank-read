@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+# vim: set filetype=python expandtab tabstop=4 shiftwidth=4 autoindent smartindent:
+"""Example script showing various pieces of data from the iBank data files."""
+
+import os
+##### HACK!
+# TODO fix virtualenv :(
+import site
+_IBANK_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_IBANK_LIB_DIR  = os.path.join(_IBANK_BASE_DIR, 'lib')
+site.addsitedir(_IBANK_LIB_DIR)
+#####
+
+import logging
+import argparse
+import ibank
+
+_HOME_DIR     = os.path.expanduser('~')
+_DATA_FILE    = os.path.join(_HOME_DIR, 'var/test-data/ibank/test.ibank')
+_LOGGER_LEVEL = logging.INFO
+# XXX this is only for debugging
+#_LOGGER_LEVEL = logging.DEBUG
+_LOGGER_NAME  = __name__
+
+
+logging.basicConfig(level=_LOGGER_LEVEL)
+logger = logging.getLogger(_LOGGER_NAME)
+
+class iBankCli(object):
+
+    def __init__(self):
+        self.logger = logger
+        self.logger.debug("Logger initialized.")
+        self.__init_cli()
+        self.__load_config
+
+    def __init_cli(self):
+        self.logger.debug("Initializing cli.")
+        self.cli = argparse.ArgumentParser()
+        self.cli.add_argument('--debug', action='store_true',
+                help='Setup to debug. (Includes logging.)')
+
+    def __load_config(self):
+        """Loading config file. (Default: $HOME/.ibank-python.ini)"""
+        # TODO load a config file
+
+    def __parse_args(self):
+        self.logger.debug("Parsing CLI args.")
+        args = self.cli.parse_args()
+        self.logger.debug("args: {0}".format(args))
+        if 'debug' in args:
+            if args.debug:
+                self.logger.setLevel(logging.DEBUG)
+                self.logger.debug("Logger set to debug.")
+
+    def main(self):
+        self.logger.debug("Inisde main.")
+        self.__parse_args()
+        # TODO add cli args for resetting data file
+        self.data_file = _DATA_FILE
+        self.logger.debug("Data file: {0}".format(self.data_file))
+        self.ibank = ibank.Reader(data_file=self.data_file)
+
+
+if __name__ == '__main__':
+    ic = iBankCli()
+    ic.main()
+# End of file.
